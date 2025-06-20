@@ -1,0 +1,145 @@
+<% layout('layout') %>
+<div class="main-section">
+  <section class="welcome">
+    <h2>건강한 식단 관리의 시작,<br>Planeat과 함께하세요</h2>
+    <p>개인 맞춤 식단 계획부터 영양 분석까지<br>당신의 건강한 라이프스타일을 위한 모든 것</p>
+    <button onclick="handleStart()">시작하기</button>
+  </section>
+
+  <section class="features">
+    <div class="feature">
+      <img src="https://cdn-icons-png.flaticon.com/512/1147/1147805.png" alt="맞춤 식단">
+      <h3>맞춤형 식단 설계</h3>
+      <p>개인의 건강 상태, 목표, 선호도를 반영한 맞춤형 식단을 제공합니다.</p>
+    </div>
+
+    <div class="feature">
+      <img src="https://cdn-icons-png.flaticon.com/512/1548/1548164.png" alt="영양 분석">
+      <h3>실시간 영양 분석</h3>
+      <p>섭취한 음식의 칼로리와 영양소를 실시간으로 분석하고 기록합니다.</p>
+    </div>
+
+    <div class="feature">
+      <img src="https://cdn-icons-png.flaticon.com/512/3209/3209112.png" alt="건강 관리">
+      <h3>건강 목표 달성</h3>
+      <p>체중 관리, 근력 향상 등 당신의 건강 목표 달성을 돕습니다.</p>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="feature">
+      <img src="https://cdn-icons-png.flaticon.com/512/706/706164.png" alt="레시피">
+      <h3>건강한 레시피</h3>
+      <p>영양가 있는 맛있는 식사를 위한 다양한 건강 레시피를 제공합니다.</p>
+    </div>
+
+    <div class="feature">
+      <img src="https://cdn-icons-png.flaticon.com/512/3588/3588658.png" alt="커뮤니티">
+      <h3>건강한 커뮤니티</h3>
+      <p>같은 목표를 가진 사람들과 함께 건강한 라이프스타일을 공유하세요.</p>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <p>&copy; 2024 Planeat. All rights reserved.</p>
+</footer>
+
+<script>
+function handleStart() {
+  const isAuthenticated = JSON.parse('<%- JSON.stringify(isAuthenticated) %>');
+  if (isAuthenticated) {
+    window.location.href = '/user';
+  } else {
+    window.location.href = '/login';
+  }
+}
+</script>
+
+<style>
+.welcome {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.welcome h2 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+.welcome p {
+  font-size: 1.2em;
+  color: #666;
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.welcome button {
+  background: linear-gradient(90deg, #48BB78 0%, #38B2AC 100%);
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.2em;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.welcome button:hover {
+  transform: translateY(-2px);
+}
+
+.features {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 40px 20px;
+  flex-wrap: wrap;
+}
+
+.feature {
+  flex: 1;
+  min-width: 250px;
+  max-width: 350px;
+  text-align: center;
+  padding: 20px;
+}
+
+.feature img {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+}
+
+.feature h3 {
+  margin-bottom: 15px;
+  color: #2D3748;
+}
+
+.feature p {
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 다크 모드 스타일 */
+[data-theme='dark'] .welcome h2 {
+  color: #9FE2BF;
+}
+
+[data-theme='dark'] .welcome p {
+  color: #E2E8F0;
+}
+
+[data-theme='dark'] .feature h3 {
+  color: #9FE2BF;
+}
+
+[data-theme='dark'] .feature p {
+  color: #E2E8F0;
+}
+
+[data-theme='dark'] footer {
+  color: #E2E8F0;
+}
+</style>

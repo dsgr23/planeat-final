@@ -1,0 +1,39 @@
+<%- layout('layout') %>
+
+<div class="main-content">
+    <% if (locals.user) { %>
+        <h1>환영합니다, <%= user.username %>님!</h1>
+        <p>Planeat에 로그인하셨습니다.</p>
+    <% } else { %>
+        <h1>Planeat에 오신 것을 환영합니다</h1>
+        <p>서비스를 이용하시려면 <a href="/login">로그인</a>해주세요.</p>
+    <% } %>
+</div>
+
+<style>
+.main-content {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+.main-content h1 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.main-content p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.main-content a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.main-content a:hover {
+    text-decoration: underline;
+}
+</style> 

@@ -1,0 +1,128 @@
+<%- layout('layout') %>
+
+<section class="main-section">
+  <h1>Login</h1>
+  <div class="login-container">
+    <form action="/login" method="POST" class="login-form" onsubmit="return validateForm()">
+      <div class="form-group">
+        <label for="username">아이디</label>
+        <input type="text" id="username" name="username" required placeholder="아이디(test)를 입력하세요">
+      </div>
+      <div class="form-group">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" name="password" required placeholder="비밀번호(test123)를 입력하세요">
+      </div>
+      <button type="submit" class="login-button">로그인</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2024 Planeat. All rights reserved.</p>
+</footer>
+
+<script>
+function validateForm() {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  
+  if (username !== 'test' || password !== 'test123') {
+    alert('ID: test\nPassword: test123을 입력해주세요.');
+    return false;
+  }
+  return true;
+}
+</script>
+
+<style>
+.main-section {
+  max-width: 1200px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 40px;
+}
+
+.login-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: bold;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.login-button {
+  background-color: #007bff;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.login-button:hover {
+  background-color: #0056b3;
+}
+
+/* 다크 모드 스타일 */
+[data-theme='dark'] .main-section {
+  background: #2D3748;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] h1 {
+  color: #9FE2BF;
+}
+
+[data-theme='dark'] .form-group label {
+  color: #E2E8F0;
+}
+
+[data-theme='dark'] .form-group input {
+  background: #1A202C;
+  border-color: #4A5568;
+  color: #E2E8F0;
+}
+
+[data-theme='dark'] .form-group input::placeholder {
+  color: #718096;
+}
+
+[data-theme='dark'] .login-button {
+  background: #68D391;
+  color: #1A202C;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .login-button:hover {
+  background: #9FE2BF;
+}
+
+[data-theme='dark'] footer {
+  color: #E2E8F0;
+}
+</style>

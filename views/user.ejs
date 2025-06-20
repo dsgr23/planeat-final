@@ -1,0 +1,1370 @@
+<%- layout('layout') %>
+<section class="main-section">
+  <div class="calculator-tabs">
+    <button class="tab-button" onclick="openCalculator('heartRate')">목표심박수계산기</button>
+    <button class="tab-button active" onclick="openCalculator('bmr')">기초대사량계산기</button>
+    <button class="tab-button" onclick="openCalculator('bmi')">체질량지수(BMI) 계산기</button>
+  </div>
+
+  <!-- 목표심박수 계산기 -->
+  <div id="heartRate" class="calculator-content" style="display: none;">
+    <div class="calculator-section">
+          <h2>
+      <span style="color: #48BB78; font-weight: bold;">○</span>
+      <%= username ? username : 'guest' %>님의 목표심박수 계산하기
+    </h2>
+    <p class="description">카보넨 공식을 이용한 목표심박수를 계산합니다.</p>
+      
+      <div class="input-group">
+        <div class="input-field">
+          <label for="hrAge">나이</label>
+          <div class="input-with-unit">
+            <input type="number" id="hrAge" min="1" max="120" placeholder="40">
+            <span class="unit">세</span>
+          </div>
+        </div>
+
+        <div class="input-field">
+          <label for="restingHR">안정시 심박수</label>
+          <div class="input-with-unit">
+            <input type="number" id="restingHR" min="40" max="120" placeholder="70">
+            <span class="unit">bpm</span>
+          </div>
+        </div>
+
+        <div class="input-field">
+          <label for="intensity">운동강도</label>
+          <div class="input-with-unit">
+            <select id="intensity">
+              <option value="0.5">50% - 가벼운 운동</option>
+              <option value="0.6">60% - 기본 운동</option>
+              <option value="0.7">70% - 중간 강도</option>
+              <option value="0.8">80% - 고강도</option>
+              <option value="0.9">90% - 최대 강도</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button onclick="calculateHeartRate()" class="calculate-btn">계산하기</button>
+          <button onclick="resetHeartRate()" class="reset-btn">초기화</button>
+        </div>
+      </div>
+
+      <div id="heartRateResult" class="result" style="display: none;">
+        <div class="result-box">
+          <div class="result-item">
+            <div class="result-label">목표심박수</div>
+            <div class="result-value"><span id="targetHR">0</span> <span class="unit">bpm</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hr-info">
+                  <h3 style="color: #2D3748;">목표심박수 계산 안내</h3>
+        <div class="info-section">
+          <h4>목표심박수 범위</h4>
+          <p>최대 맥박의 <span class="highlight">60-90%</span>가 얼마인지를 알기 위해서 나이(혹은 휴지기 맥박)을 이용합니다.</p>
+          <ul>
+            <li>운동 초보자: 최대 맥박수의 <span class="highlight">60%</span> 목표</li>
+            <li>운동선수: 최대 맥박수의 <span class="highlight">90%</span>까지 도달 가능</li>
+          </ul>
+        </div>
+
+                  <div class="info-section">
+            <h4>계산식</h4>
+            <div class="formula-box">
+              <div class="formula-line">목표심박수 = [220-나이-안정시 심박수] × 운동강도 + 안정시 심박수 (카보넨 공식)</div>
+            </div>
+          </div>
+
+        <div class="info-section">
+          <h4>맥박 측정 방법</h4>
+          <ol>
+            <li>집게손가락을 사용해서 손목의 엄지손가락 옆부분의 뼈가 돌출한 부위에 놓습니다.</li>
+            <li>손가락을 손목의 중앙 부분으로 살며시 내려놓습니다.</li>
+            <li>15초 동안 맥박을 재고 나서 4를 곱합니다.</li>
+          </ol>
+        </div>
+
+        <div class="info-section">
+          <h4>주의사항</h4>
+          <ul>
+            <li>목표 심박수 계산은 일반인들의 평균치를 사용하여 구하고 있습니다.</li>
+            <li>심장장애를 가지고 있거나 특별한 체중, 헬스 혹은 운동 요구조건을 가지고 있다면 운동 전문가나 의사에게 상담해야 합니다.</li>
+            <li>운동의 강도는 말하기 힘든 정도가 아닌 노래하기 힘든 정도로 해야 합니다.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 기초대사량 계산기 -->
+  <div id="bmr" class="calculator-content">
+    <div class="calculator-section">
+          <h2>
+      <span class="icon">○</span>
+      <%= username ? username : 'guest' %>님의 기초대사량 계산하기
+    </h2>
+    <p class="description">성별, 나이, 키, 체중을 입력하여 기초대사량을 계산합니다.</p>
+      
+      <div class="input-group">
+                  <div class="input-field">
+            <label for="gender">성별</label>
+            <div class="input-with-unit">
+              <select id="gender">
+                <option value="male">남성 (Male)</option>
+                <option value="female">여성 (Female)</option>
+              </select>
+            </div>
+          </div>
+
+        <div class="input-field">
+          <label for="bmrAge">나이</label>
+          <div class="input-with-unit">
+            <input type="number" id="bmrAge" min="1" max="120" placeholder="40">
+            <span class="unit">세</span>
+          </div>
+        </div>
+
+        <div class="input-field">
+          <label for="bmrHeight">신장</label>
+          <div class="input-with-unit">
+            <input type="number" id="bmrHeight" min="100" max="250" placeholder="170">
+            <span class="unit">cm</span>
+          </div>
+        </div>
+
+        <div class="input-field">
+          <label for="bmrWeight">체중</label>
+          <div class="input-with-unit">
+            <input type="number" id="bmrWeight" min="30" max="200" placeholder="70">
+            <span class="unit">kg</span>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button onclick="calculateBMR()" class="calculate-btn">계산하기</button>
+          <button onclick="resetBMR()" class="reset-btn">초기화</button>
+        </div>
+      </div>
+
+      <div id="bmrResult" class="result" style="display: none;">
+        <div class="result-box">
+          <div class="result-item">
+            <div class="result-label">기초대사량</div>
+            <div class="result-value"><span id="bmrValue">0</span> <span class="unit">kcal</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bmr-info">
+        <h3>기초대사량 계산 안내</h3>
+        <div class="info-section">
+          <h4>기초대사량이란?</h4>
+          <p>기초대사량은 <span class="highlight">생명을 유지하는데 필요한 최소한의 에너지량</span>을 말합니다.</p>
+          <ul>
+            <li>심장박동, 호흡, 체온유지 등 <span class="highlight">생명 유지에 필요한 에너지</span>입니다.</li>
+            <li>하루 총 소비 열량의 약 <span class="highlight">60-70%</span>를 차지합니다.</li>
+            <li>나이가 들수록 <span class="highlight">매년 2-3%</span> 감소합니다.</li>
+          </ul>
+        </div>
+
+        <div class="info-section">
+          <h4>계산식</h4>
+          <div class="formula-box">
+            <div class="formula-line">남성: 66.47 + (13.75 × 체중) + (5 × 신장) - (6.76 × 나이)</div>
+            <div class="formula-line">여성: 655.1 + (9.56 × 체중) + (1.85 × 신장) - (4.68 × 나이)</div>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h4>주의사항</h4>
+          <ul>
+            <li>기초대사량은 <span class="highlight">개인차가 크므로</span> 계산된 값은 참고용으로만 사용하세요.</li>
+            <li>정확한 측정을 위해서는 <span class="highlight">전문 의료기관의 검사</span>를 받으시기 바랍니다.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BMI 계산기 -->
+  <div id="bmi" class="calculator-content" style="display: none;">
+    <div class="bmi-calculator">
+      <h2>
+        <span class="icon">○</span>
+        <%= username ? username : 'guest' %>님의 체질량지수(BMI) 계산하기
+      </h2>
+      <p class="description">신장과 체중을 입력하고 계산하기 버튼을 클릭하여 결과를 확인 하세요.</p>
+      
+      <div class="input-group">
+        <div class="input-field">
+          <label for="height">신장</label>
+          <div class="input-with-unit">
+            <input type="number" id="height" min="100" max="250" placeholder="170">
+            <span class="unit">cm</span>
+          </div>
+        </div>
+
+        <div class="input-field">
+          <label for="weight">체중</label>
+          <div class="input-with-unit">
+            <input type="number" id="weight" min="30" max="200" placeholder="80">
+            <span class="unit">kg</span>
+          </div>
+        </div>
+
+        <button onclick="calculateBMI()" class="calculate-btn-bmi">계산하기</button>
+        <button onclick="resetBMI()" class="reset-btn-bmi">초기화</button>
+      </div>
+
+      <div id="bmiResult" class="bmi-result" style="display: none;">
+        <p class="result-text">당신의 신체질량지수(BMI)는 <span id="bmiValue">0</span> 으로 <span id="bmiStatus">정상</span>입니다.</p>
+        
+        <div class="bmi-gauge">
+          <div class="gauge-bar">
+            <div class="range low">저체중</div>
+            <div class="range normal">정상</div>
+            <div class="range over">과체중</div>
+            <div class="range obese">비만</div>
+          </div>
+          <div class="gauge-marker" id="bmiMarker"></div>
+          <div class="gauge-values">
+            <span>18.5</span>
+            <span>23</span>
+            <span>25</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bmi-info">
+        <h3>신체질량지수(Body Mass Index: BMI, 카우프지수)</h3>
+        <p>비만의 판정의 올바른 지표는 체중이 아니라 체지방량이므로 몸의 지방량을 직접 측정하는 것이 이상적이나 기술적인 어려움 때문에 표준 신장 · 체중으로 계산하는 신체질량지수(BMI)가 체지방량을 간접적으로 측정하는 방법으로 가장 널리 사용되고 있습니다.</p>
+      </div>
+
+      <div class="bmi-reference">
+        <div class="bmi-image">
+          <img src="/images/비만도.jpg" alt="BMI 기준표" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.calculator-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  background: #E2E8F0;
+  color: #4A5568;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-button:hover {
+  background: #CBD5E0;
+}
+
+.tab-button.active {
+  background: #48BB78;
+  color: white;
+}
+
+.calculator-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(72, 187, 120, 0.2);
+}
+
+/* 다크 모드 스타일 */
+[data-theme='dark'] .tab-button {
+  background: #2D3748;
+  color: #E2E8F0;
+  border: 1px solid rgba(104, 211, 145, 0.2);
+}
+
+[data-theme='dark'] .tab-button:hover {
+  background: #4A5568;
+  border-color: rgba(104, 211, 145, 0.4);
+}
+
+[data-theme='dark'] .tab-button.active {
+  background: #68D391;
+  color: #1A202C;
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 0 10px rgba(104, 211, 145, 0.3);
+}
+
+[data-theme='dark'] .calculator-section {
+  background: #2D3748;
+  border: 1px solid rgba(104, 211, 145, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.main-section {
+  max-width: 1200px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 40px;
+  border: 1px solid rgba(72, 187, 120, 0.2);
+}
+
+/* 다크 모드 스타일 */
+[data-theme='dark'] .main-section {
+  background: #1A202C;
+  border: 1px solid rgba(104, 211, 145, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme='dark'] h1 {
+  color: #9FE2BF;
+  font-weight: 700;
+}
+
+.bmi-calculator {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  border: 1px solid rgba(72, 187, 120, 0.2);
+}
+
+.bmi-calculator h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #2D3748;
+  margin-bottom: 15px;
+}
+
+.icon {
+  color: #48BB78;
+  font-weight: bold;
+}
+
+.description {
+  color: #718096;
+  margin-bottom: 30px;
+}
+
+.input-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  align-items: end;
+  margin-bottom: 30px;
+}
+
+.input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-field label {
+  display: block;
+  margin-bottom: 8px;
+  color: #4A5568;
+  font-weight: 500;
+}
+
+.input-with-unit {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-unit input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #E2E8F0;
+  border-radius: 6px;
+  font-size: 16px;
+  padding-right: 40px;
+}
+
+.input-with-unit select {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid #E2E8F0;
+  border-radius: 6px;
+  background-color: white;
+  cursor: pointer;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%234A5568' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
+  padding-right: 40px;
+}
+
+.input-with-unit select::-ms-expand {
+  display: none;
+}
+
+/* 다크모드 드롭다운 스타일 */
+[data-theme='dark'] .input-with-unit select {
+  background-color: #1A202C;
+  border-color: #4A5568;
+  color: #E2E8F0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23E2E8F0' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+}
+
+.calculate-btn, .reset-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  height: 42px;
+}
+
+.calculate-btn {
+  background: #48BB78;
+  color: white;
+}
+
+.reset-btn {
+  background: #E2E8F0;
+  color: #4A5568;
+}
+
+.bmi-result {
+  margin-top: 30px;
+  background: #F7FAFC;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(72, 187, 120, 0.15);
+}
+
+.result-text {
+  font-size: 1.3em;
+  margin-bottom: 30px;
+  color: #2D3748;
+  text-align: center;
+  font-weight: 600;
+}
+
+.result-text #bmiValue {
+  color: #48BB78;
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+.result-text #bmiStatus {
+  font-weight: 700;
+}
+
+.bmi-gauge {
+  position: relative;
+  padding-top: 40px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.gauge-bar {
+  display: flex;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.gauge-bar .range {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.range.low { 
+  background: linear-gradient(45deg, #4299E1, #63B3ED);
+}
+.range.normal { 
+  background: linear-gradient(45deg, #48BB78, #68D391);
+}
+.range.over { 
+  background: linear-gradient(45deg, #ED8936, #F6AD55);
+}
+.range.obese { 
+  background: linear-gradient(45deg, #E53E3E, #FC8181);
+}
+
+.gauge-marker {
+  position: absolute;
+  top: 0;
+  width: 3px;
+  height: 50px;
+  background: #2D3748;
+  transform: translateX(-50%);
+  transition: left 0.5s ease;
+  z-index: 10;
+}
+
+.gauge-marker::after {
+  content: '▼';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #2D3748;
+  font-size: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.gauge-values {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  color: #4A5568;
+  font-size: 15px;
+  font-weight: 600;
+  position: relative;
+  width: 100%;
+}
+
+.gauge-values span {
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.gauge-values span:nth-child(1) {
+  left: 25%;
+}
+
+.gauge-values span:nth-child(2) {
+  left: 50%;
+}
+
+.gauge-values span:nth-child(3) {
+  left: 75%;
+}
+
+/* 기준값 레이블 추가 */
+.gauge-labels {
+  display: flex;
+  margin-top: 40px;
+  position: relative;
+  width: 100%;
+}
+
+.gauge-label {
+  position: absolute;
+  transform: translateX(-50%);
+  text-align: center;
+  color: #718096;
+  font-size: 14px;
+}
+
+.gauge-label:nth-child(1) {
+  left: 12.5%;
+}
+
+.gauge-label:nth-child(2) {
+  left: 37.5%;
+}
+
+.gauge-label:nth-child(3) {
+  left: 62.5%;
+}
+
+.gauge-label:nth-child(4) {
+  left: 87.5%;
+}
+
+[data-theme='dark'] .gauge-label {
+  color: #A0AEC0;
+}
+
+/* 다크 모드 스타일 */
+[data-theme='dark'] .bmi-result {
+  background: #2D3748;
+  border: 1px solid rgba(104, 211, 145, 0.15);
+}
+
+[data-theme='dark'] .result-text {
+  color: #F7FAFC;
+}
+
+[data-theme='dark'] .result-text #bmiValue {
+  color: #68D391;
+  font-weight: 700;
+}
+
+[data-theme='dark'] .gauge-marker {
+  background: #F7FAFC;
+}
+
+[data-theme='dark'] .gauge-marker::after {
+  color: #F7FAFC;
+}
+
+[data-theme='dark'] .gauge-values {
+  color: #E2E8F0;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .gauge-bar {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* BMI 상태에 따른 텍스트 색상 */
+#bmiStatus.저체중 { color: #4299E1; }
+#bmiStatus.정상 { color: #48BB78; }
+#bmiStatus.과체중 { color: #ED8936; }
+#bmiStatus.비만 { color: #E53E3E; }
+
+[data-theme='dark'] #bmiStatus.저체중 { color: #90CDF4; }
+[data-theme='dark'] #bmiStatus.정상 { color: #68D391; }
+[data-theme='dark'] #bmiStatus.과체중 { color: #F6AD55; }
+[data-theme='dark'] #bmiStatus.비만 { color: #FC8181; }
+
+.bmi-info, .bmi-reference {
+  margin-top: 40px;
+  padding: 30px;
+  background: #F7FAFC;
+  border-radius: 12px;
+  border-left: 5px solid #48BB78;
+  border: 1px solid rgba(72, 187, 120, 0.15);
+}
+
+.bmi-reference {
+  margin-top: 20px;
+  border-left-color: #4299E1;
+}
+
+[data-theme='dark'] .bmi-info,
+[data-theme='dark'] .bmi-reference {
+  background: #2D3748;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(104, 211, 145, 0.15);
+}
+
+[data-theme='dark'] .bmi-info {
+  border-left-color: #68D391;
+}
+
+[data-theme='dark'] .bmi-reference {
+  border-left-color: #63B3ED;
+}
+
+.bmi-info h3 {
+  color: #2D3748;
+  font-size: 1.1em;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.bmi-info p {
+  color: #4A5568;
+  line-height: 1.6;
+  font-size: 0.95em;
+}
+
+.bmi-image {
+  margin-top: 25px;
+  text-align: center;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.bmi-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] .bmi-image img {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .bmi-image {
+  background: white;  /* Keep white background even in dark mode */
+}
+
+/* 다크 모드 스타일 개선 */
+[data-theme='dark'] .bmi-calculator {
+  background: #2D3748;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(104, 211, 145, 0.2);
+}
+
+[data-theme='dark'] .input-field label {
+  color: #9FE2BF;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .input-with-unit input,
+[data-theme='dark'] .input-with-unit select {
+  background: #1A202C;
+  border: 2px solid #4A5568;
+  color: #E2E8F0;
+}
+
+[data-theme='dark'] .input-with-unit input:focus,
+[data-theme='dark'] .input-with-unit select:focus {
+  border-color: #68D391;
+  box-shadow: 0 0 0 3px rgba(104, 211, 145, 0.2);
+}
+
+[data-theme='dark'] .input-with-unit .unit {
+  color: #9FE2BF;
+}
+
+[data-theme='dark'] .calculate-btn {
+  background: #68D391;
+  color: #1A202C;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(104, 211, 145, 0.2);
+}
+
+[data-theme='dark'] .calculate-btn:hover {
+  background: #9FE2BF;
+  box-shadow: 0 4px 6px rgba(104, 211, 145, 0.3);
+}
+
+[data-theme='dark'] .reset-btn {
+  background: #4A5568;
+  color: #E2E8F0;
+  border: 1px solid rgba(226, 232, 240, 0.2);
+}
+
+[data-theme='dark'] .reset-btn:hover {
+  background: #2D3748;
+  border-color: rgba(226, 232, 240, 0.4);
+}
+
+[data-theme='dark'] .bmi-result {
+  background: #1A202C;
+  border: 1px solid rgba(104, 211, 145, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .result-text {
+  color: #E2E8F0;
+}
+
+[data-theme='dark'] #bmiValue,
+[data-theme='dark'] #targetHR,
+[data-theme='dark'] #bmrValue {
+  color: #68D391;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .bmi-info,
+[data-theme='dark'] .bmi-reference {
+  background: #2D3748;
+  border: 1px solid rgba(104, 211, 145, 0.3);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .bmi-info h3 {
+  color: #9FE2BF;
+  font-weight: 700;
+}
+
+[data-theme='dark'] .bmi-info p {
+  color: #E2E8F0;
+  line-height: 1.8;
+}
+
+/* BMI 상태 텍스트 색상 개선 */
+[data-theme='dark'] #bmiStatus.저체중 { color: #90CDF4; }
+[data-theme='dark'] #bmiStatus.정상 { color: #68D391; }
+[data-theme='dark'] #bmiStatus.과체중 { color: #F6AD55; }
+[data-theme='dark'] #bmiStatus.비만 { color: #FC8181; }
+
+/* 게이지 바 색상 개선 */
+[data-theme='dark'] .range.low { 
+  background: linear-gradient(45deg, #4299E1, #90CDF4);
+}
+[data-theme='dark'] .range.normal { 
+  background: linear-gradient(45deg, #48BB78, #68D391);
+}
+[data-theme='dark'] .range.over { 
+  background: linear-gradient(45deg, #ED8936, #F6AD55);
+}
+[data-theme='dark'] .range.obese { 
+  background: linear-gradient(45deg, #E53E3E, #FC8181);
+}
+
+[data-theme='dark'] .bmi-calculator h2 {
+  color: #9FE2BF;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .icon {
+  color: #68D391;
+}
+
+[data-theme='dark'] .description {
+  color: #CBD5E0;
+  font-weight: 500;
+}
+
+[data-theme='dark'] .calculator-tabs {
+  background: rgba(26, 32, 44, 0.6);
+  padding: 10px;
+  border-radius: 12px;
+}
+
+/* 성별 선택 필드 크기 조정 */
+#gender {
+  min-width: 200px;
+  height: 42px;
+}
+
+/* 운동강도 선택 필드 크기 조정 */
+#intensity {
+  min-width: 200px;
+  height: 42px;
+}
+
+/* 버튼 그룹 정렬 */
+.button-group {
+  display: flex;
+  gap: 10px;
+  grid-column: 1 / -1;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* 다크모드 스타일 */
+[data-theme='dark'] .input-with-unit select {
+  background-color: #1A202C;
+  border-color: #4A5568;
+  color: #E2E8F0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23E2E8F0' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+}
+
+[data-theme='dark'] .input-with-unit select:hover {
+  border-color: #68D391;
+}
+
+[data-theme='dark'] .input-with-unit select:focus {
+  border-color: #68D391;
+  box-shadow: 0 0 0 3px rgba(104, 211, 145, 0.2);
+  outline: none;
+}
+
+/* BMI 계산기 버튼 스타일 */
+.button-group-bmi {
+  display: flex;
+  gap: 10px;
+}
+
+.calculate-btn-bmi, .reset-btn-bmi {
+  padding: 10px 20px;
+  height: 42px;
+  min-width: 100px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.calculate-btn-bmi {
+  background: #48BB78;
+  color: white;
+}
+
+.reset-btn-bmi {
+  background: #E2E8F0;
+  color: #4A5568;
+}
+
+.calculate-btn-bmi:hover {
+  background: #38A169;
+}
+
+.reset-btn-bmi:hover {
+  background: #CBD5E0;
+}
+
+/* 다크모드 스타일 */
+[data-theme='dark'] .calculate-btn-bmi {
+  background: #68D391;
+  color: #1A202C;
+}
+
+[data-theme='dark'] .reset-btn-bmi {
+  background: #4A5568;
+  color: #E2E8F0;
+}
+
+[data-theme='dark'] .calculate-btn-bmi:hover {
+  background: #9FE2BF;
+}
+
+[data-theme='dark'] .reset-btn-bmi:hover {
+  background: #2D3748;
+}
+
+/* BMI 입력 필드와 버튼 정렬 */
+.bmi-calculator .input-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.bmi-calculator .input-field {
+  width: 250px;
+}
+
+.bmi-calculator .input-with-unit {
+  width: 100%;
+}
+
+.bmi-calculator .input-with-unit input {
+  width: 100%;
+  height: 36px;
+  padding: 6px 35px 6px 10px;
+  font-size: 14px;
+}
+
+.bmi-calculator .input-with-unit .unit {
+  font-size: 14px;
+}
+
+.calculate-btn-bmi, .reset-btn-bmi {
+  height: 36px;
+  padding: 0 30px;
+  font-size: 14px;
+}
+
+/* 결과 표시 스타일 */
+.result {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.result-box {
+  margin-top: 30px;
+  background: #F7FAFC;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(72, 187, 120, 0.2);
+  width: 100%;
+  max-width: 500px;
+}
+
+.result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.result-label {
+  font-size: 16px;
+  color: white;
+  font-weight: 600;
+  padding: 8px 16px;
+  background: #48BB78;
+  border-radius: 6px;
+  min-width: 120px;
+  text-align: center;
+}
+
+.result-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2D3748;
+  padding-right: 20px;
+}
+
+.result-value span.unit {
+  font-size: 16px;
+  color: #718096;
+  margin-left: 4px;
+}
+
+/* 목표심박수 결과 특화 스타일 */
+#heartRateResult .result-label {
+  background: #4299E1;
+}
+
+/* 기초대사량 결과 특화 스타일 */
+#bmrResult .result-label {
+  background: #48BB78;
+}
+
+/* 다크모드 스타일 */
+[data-theme='dark'] .result-box {
+  background: #2D3748;
+  border-color: rgba(104, 211, 145, 0.2);
+}
+
+[data-theme='dark'] .result-item {
+  background: #1A202C;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .result-label {
+  color: #1A202C;
+}
+
+[data-theme='dark'] #heartRateResult .result-label {
+  background: #63B3ED;
+}
+
+[data-theme='dark'] #bmrResult .result-label {
+  background: #68D391;
+}
+
+[data-theme='dark'] .result-value {
+  color: #E2E8F0;
+}
+
+[data-theme='dark'] .result-value span.unit {
+  color: #A0AEC0;
+}
+
+/* 계산기 제목 스타일 */
+.calculator-section h2 {
+  color: #2D3748;
+  margin-bottom: 15px;
+  font-size: 1.5em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.calculator-section h2 .icon {
+  color: #48BB78;
+  font-weight: bold;
+}
+
+/* 다크모드 계산기 제목 스타일 */
+[data-theme='dark'] .calculator-section h2 {
+  color: #E2E8F0;
+}
+
+[data-theme='dark'] .calculator-section h2 .icon {
+  color: #68D391;
+}
+
+/* 각 계산기별 아이콘 색상 */
+#heartRate h2 .icon {
+  color: #4299E1;
+}
+
+#bmr h2 .icon {
+  color: #48BB78;
+}
+
+[data-theme='dark'] #heartRate h2 .icon {
+  color: #63B3ED;
+}
+
+[data-theme='dark'] #bmr h2 .icon {
+  color: #68D391;
+}
+
+/* 목표심박수 정보 스타일 */
+.hr-info {
+  margin-top: 40px;
+  padding: 30px;
+  background: #F7FAFC;
+  border-radius: 12px;
+  border: 1px solid rgba(66, 153, 225, 0.2);
+}
+
+.hr-info h3 {
+  color: #48BB78;
+  font-size: 1.4em;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(72, 187, 120, 0.2);
+}
+
+.info-section {
+  margin-bottom: 25px;
+}
+
+.info-section:last-child {
+  margin-bottom: 0;
+}
+
+.info-section h4 {
+  color: #2D3748;
+  font-size: 1.1em;
+  margin-bottom: 12px;
+}
+
+.info-section p {
+  color: #4A5568;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.info-section ul, .info-section ol {
+  color: #4A5568;
+  padding-left: 20px;
+  margin-top: 10px;
+}
+
+.info-section li {
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.formula-box {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-weight: 500;
+  margin: 15px 0;
+  line-height: 1.8;
+  font-size: 1.1em;
+}
+
+[data-theme='dark'] .formula-box {
+  background: #1A202C;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.formula-box .formula-line {
+  margin-bottom: 12px;
+}
+
+.formula-box .formula-line:last-child {
+  margin-bottom: 0;
+}
+
+/* 다크모드 스타일 */
+[data-theme='dark'] .hr-info {
+  background: #2D3748;
+  border-color: rgba(99, 179, 237, 0.3);
+}
+
+[data-theme='dark'] .hr-info h3 {
+  color: #E2E8F0;
+  border-bottom-color: rgba(99, 179, 237, 0.3);
+}
+
+[data-theme='dark'] .info-section h4 {
+  color: #E2E8F0;
+}
+
+[data-theme='dark'] .info-section p,
+[data-theme='dark'] .info-section ul,
+[data-theme='dark'] .info-section ol,
+[data-theme='dark'] .info-section li {
+  color: #E2E8F0;
+}
+
+.info-section p .highlight,
+.info-section li .highlight,
+.formula-box .highlight {
+  color: #2D3748;
+  font-weight: 600;
+}
+
+[data-theme='dark'] .info-section p .highlight,
+[data-theme='dark'] .info-section li .highlight,
+[data-theme='dark'] .formula-box .highlight {
+  color: #E2E8F0;
+}
+
+.formula-box .highlight {
+  color: #48BB78;
+  font-weight: 700;
+}
+
+[data-theme='dark'] .formula-box .highlight {
+  color: #68D391;
+}
+
+/* BMR 정보 스타일 */
+.bmr-info {
+  margin-top: 40px;
+  padding: 30px;
+  background: #F7FAFC;
+  border-radius: 12px;
+  border: 1px solid rgba(72, 187, 120, 0.2);
+}
+
+.bmr-info h3 {
+  color: #48BB78;
+  font-size: 1.4em;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(72, 187, 120, 0.2);
+}
+
+[data-theme='dark'] .bmr-info {
+  background: #2D3748;
+  border-color: rgba(104, 211, 145, 0.3);
+}
+
+[data-theme='dark'] .bmr-info h3 {
+  color: #E2E8F0;
+  border-bottom-color: rgba(104, 211, 145, 0.3);
+}
+</style>
+
+<script>
+function openCalculator(calculatorId) {
+  // 모든 계산기 숨기기
+  document.querySelectorAll('.calculator-content').forEach(content => {
+    content.style.display = 'none';
+  });
+  
+  // 모든 탭 버튼에서 active 클래스 제거
+  document.querySelectorAll('.tab-button').forEach(button => {
+    button.classList.remove('active');
+  });
+  
+  // 선택된 계산기 표시
+  document.getElementById(calculatorId).style.display = 'block';
+  
+  // 선택된 탭 버튼에 active 클래스 추가
+  event.target.classList.add('active');
+}
+
+function calculateHeartRate() {
+  const age = parseFloat(document.getElementById('hrAge').value);
+  const restingHR = parseFloat(document.getElementById('restingHR').value);
+  const intensity = parseFloat(document.getElementById('intensity').value);
+  
+  if (!age || !restingHR || !intensity) {
+    alert('모든 값을 입력해주세요.');
+    return;
+  }
+  
+  const targetHR = Math.round((220 - age - restingHR) * intensity + restingHR);
+  
+  document.getElementById('targetHR').textContent = targetHR;
+  document.getElementById('heartRateResult').style.display = 'block';
+}
+
+function calculateBMR() {
+  const gender = document.getElementById('gender').value;
+  const age = parseFloat(document.getElementById('bmrAge').value);
+  const height = parseFloat(document.getElementById('bmrHeight').value);
+  const weight = parseFloat(document.getElementById('bmrWeight').value);
+  
+  if (!age || !height || !weight) {
+    alert('모든 값을 입력해주세요.');
+    return;
+  }
+  
+  let bmr;
+  if (gender === 'male') {
+    bmr = 66.47 + (13.75 * weight) + (5 * height) - (6.76 * age);
+  } else {
+    bmr = 655.1 + (9.56 * weight) + (1.85 * height) - (4.68 * age);
+  }
+  
+  document.getElementById('bmrValue').textContent = Math.round(bmr);
+  document.getElementById('bmrResult').style.display = 'block';
+}
+
+function resetHeartRate() {
+  document.getElementById('hrAge').value = '';
+  document.getElementById('restingHR').value = '';
+  document.getElementById('intensity').value = '0.5';
+  document.getElementById('heartRateResult').style.display = 'none';
+}
+
+function resetBMR() {
+  document.getElementById('bmrAge').value = '';
+  document.getElementById('bmrHeight').value = '';
+  document.getElementById('bmrWeight').value = '';
+  document.getElementById('gender').value = 'male';
+  document.getElementById('bmrResult').style.display = 'none';
+}
+
+function calculateBMI() {
+  const height = parseFloat(document.getElementById('height').value) / 100;
+  const weight = parseFloat(document.getElementById('weight').value);
+  
+  if (!height || !weight || height <= 0 || weight <= 0) {
+    alert('올바른 신장과 체중을 입력해주세요.');
+    return;
+  }
+
+  const bmi = weight / (height * height);
+  const bmiValue = bmi.toFixed(2);
+  
+  let status;
+  let position;
+  if (bmi < 18.5) {
+    status = '저체중';
+    position = (bmi / 18.5) * 25;
+  } else if (bmi < 23) {
+    status = '정상';
+    position = 25 + ((bmi - 18.5) / 4.5) * 25;
+  } else if (bmi < 25) {
+    status = '과체중';
+    position = 50 + ((bmi - 23) / 2) * 25;
+  } else {
+    status = '비만';
+    position = Math.min(100, 75 + ((bmi - 25) / 5) * 25);
+  }
+
+  const bmiValueElement = document.getElementById('bmiValue');
+  const bmiStatusElement = document.getElementById('bmiStatus');
+  
+  bmiValueElement.textContent = bmiValue;
+  bmiStatusElement.textContent = status;
+  
+  bmiStatusElement.classList.remove('저체중', '정상', '과체중', '비만');
+  bmiStatusElement.classList.add(status);
+  
+  document.getElementById('bmiMarker').style.left = `${position}%`;
+  document.getElementById('bmiResult').style.display = 'block';
+}
+
+function resetBMI() {
+  document.getElementById('height').value = '';
+  document.getElementById('weight').value = '';
+  document.getElementById('bmiResult').style.display = 'none';
+  
+  const bmiStatusElement = document.getElementById('bmiStatus');
+  bmiStatusElement.classList.remove('저체중', '정상', '과체중', '비만');
+}
+</script>
+
+<footer>
+  <p>&copy; 2024 Planeat. All rights reserved.</p>
+</footer>
